@@ -15,14 +15,21 @@
 
 
 rcl_subscription_t subscriber;
-// rcl_publisher_t publisher;
+rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
-// std_msgs__msg__Int32 pub_msg;
+std_msgs__msg__Int32 pub_msg;
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
+
+
+long num_of_revs = 0;
+
+long distance = 73;
+
+long circumference = 0;
 
 
 
@@ -37,6 +44,16 @@ void error_loop(){
     delay(400);
   }
 }
+
+void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+{  
+  RCLC_UNUSED(last_call_time);
+  if (timer != NULL) {
+    RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
+    pub_msg.data = distance;
+  }
+}
+
 
 // Callback fuction triggered when some data is received via the key topic
 void subscription_callback(const void * msgin)
@@ -58,17 +75,16 @@ void subscription_callback(const void * msgin)
 
 void setup() {
 
-  // Serial.begin(115200);
-  // set_microros_serial_transports(Serial);
+  Serial.begin(115200);
+  set_microros_serial_transports(Serial);
 
-  char ssid[] = "Galaxy A71EEF6";
-  char pass[]= "wqmg3499"; 
+  // char ssid[] = "Galaxy A71EEF6";
+  // char pass[]= "wqmg3499"; 
 
-  IPAddress agent_ip(192, 168, 178, 14 );
-  size_t agent_port = 8888;
+  // IPAddress agent_ip(192, 168, 178, 14 );
+  // size_t agent_port = 8888;
 
-  set_microros_wifi_transports(ssid, pass, agent_ip, agent_port);
-  // // set_microros_wifi_transports("Youssef", pass, "192.168.0.147", 8888);
+  // set_microros_wifi_transports(ssid, pass, agent_ip, agent_port);
 
   
   pinMode(BUILTIN_LED, OUTPUT);
@@ -86,6 +102,19 @@ void setup() {
   //create node
   RCCHECK(rclc_node_init_default(&node, "micro_ros_platformio_node", "", &support));
 
+  // create publisher
+  RCCHECK(rclc_publisher_init_default(
+    &publisher,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+    "distance"));
+
+  // create timer,
+  const unsigned int timer_timeout = 1;
+  RCCHECK(rclc_timer_init_default(
+    &timer,
+    &support,
+    RCL_MS_TO_NS(timer_timeout),timer_callback));
 
   //create subscriber
   RCCHECK(rclc_subscription_init_default(
@@ -95,15 +124,20 @@ void setup() {
 
 
   //create executor
-  RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
+  RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
   RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &msg, &subscription_callback, ON_NEW_DATA));
-  // RCCHECK(rclc_executor_add_timer(&executor, &timer));
+  RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
 
 }
 
+
 void loop() {
-  delay(100);
+  // delay(100);
   RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+
+  // if (ir_sensor_read)
+  //   num_of_revs++;
+  //   distance = circumference * num_of_revs;
 
 }
