@@ -12,11 +12,17 @@
 class Communication
 {
 private:
-    double baud_rate;
-    char* wifi_ssif;
+    int baud_rate;
+    char* wifi_ssid;
     char* wifi_pass;
     IPAddress agent_ip;
     unsigned int agent_port;
 public:
-
+    Communication(int , char*, char*, IPAddress, unsigned int);
+    void serial_comm();
+    void wifi_comm();
+    // void sub_callback(const void* );
+    // void timer_callback(rcl_timer_t*, int64_t);
+    void intialize_comms();
+    void execute();
 };
