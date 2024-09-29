@@ -3,20 +3,41 @@
 
 void Motor::rotate_forward()
 {
-    digitalWrite(this->forward_pin,HIGH);
-    digitalWrite(this->backward_pin,LOW);
-    this->state = 1;
+    if(this->state == 0 || this->state == 1)
+    {
+        this->speed+=70;
+        if(this->speed > 255)
+            this->speed == 255;
+        analogWrite(this->forward_pin,this->speed);
+        analogWrite(this->backward_pin,0);
+        this->state = 1;
+    }
+    else if (this->state == -1)
+    {
+        this->stop();
+    }
 }
 void Motor::rotate_backward()
 {
-    digitalWrite(this->forward_pin,LOW);
-    digitalWrite(this->backward_pin,HIGH);
-    this->state = -1;
+    if(this->state == 0 || this->state == -1)
+    {
+        this->speed-=70;
+        if(this->speed < -255)
+            this->speed == -255;
+        analogWrite(this->forward_pin,0);
+        analogWrite(this->backward_pin,abs(this->speed));
+        this->state = -1;
+    }
+    else if (this->state == 1)
+    {
+        this->stop();
+    }
 }
 void Motor::stop()
 {
-    digitalWrite(this->forward_pin,LOW);
-    digitalWrite(this->backward_pin,LOW);
+    analogWrite(this->forward_pin,0);
+    analogWrite(this->backward_pin,0);
+    this->speed = 0;
     this->state = 0;
 }
 

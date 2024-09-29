@@ -1,6 +1,7 @@
 #include "communication.h"
 #include "motor.h"
 #include "ir_sensor.h"
+#include "rover.h"
 rcl_subscription_t subscriber;
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
@@ -12,11 +13,15 @@ rcl_node_t node;
 rcl_timer_t timer;
 
 // double distance = 0;  /////////////////////*\\\\\\\\\\\\\\\\\\\\
+// digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
 
 int ir_count = 0;
 
 Motor left_motor(2,4);
+// Motor right_motor(12,14);
+// Motor motors[2] = {left_motor, right_motor};
 Ir_sensor ir(5);
+// Rover our_rover(motors, ir, 14);
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -25,24 +30,30 @@ void subscription_callback(const void * msgin)
 {  
   const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
   
-  if (msg->data == 1)    // forward
-    {
-    digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
-    
-    left_motor.rotate_forward();
-    }
-  if (msg->data == 2)   // left
-    left_motor.stop();
-
+  if (msg->data == 1)    
+  {
+    left_motor.rotate_forward();  // forward
+  }
+  if (msg->data == 2)   
+  {
+      // left
+  }
   if (msg->data == 3)
-    {// backward
-    left_motor.rotate_backward();
-    }
-  if (msg->data == 4);    // right
+  {
+    left_motor.rotate_backward(); // backward
+  }
+  if (msg->data == 4)   
+  {
+      // right
+  }
+  if (msg->data == 0)   
+  {
+    left_motor.stop();  // stop
+  }
 
 }
 
-int flag = 0;
+int prev_state = 0;
 
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {  
@@ -50,15 +61,18 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
     
-    if (digitalRead(5))
+    if (ir.get_reading() || prev_state)
     {
-      if(flag == 0)
+      if(prev_state == 0)
       {
       ir_count++;
-      digitalWrite(BUILTIN_LED,LOW);
-      flag = 1;
+      prev_state = 1;
       }
-    digitalWrite(BUILTIN_LED,HIGH);
+      else if (prev_state == 1 && !ir.get_reading())
+      {
+        prev_state = 0;
+      }
+    }
     pub_msg.data = ir_count;
   }
 }
@@ -92,7 +106,7 @@ void Communication::intialize_comms()
     "distance");
 
   // create timer,
-  const unsigned int timer_timeout = 1;
+  const unsigned int timer_timeout = 0;
   rclc_timer_init_default(&timer, &support, RCL_MS_TO_NS(timer_timeout), timer_callback);
 
   //create subscriber

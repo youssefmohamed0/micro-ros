@@ -1,3 +1,7 @@
+#ifndef COMMUNICATION_H
+#define COMMUNICATION_H
+
+
 #include <Arduino.h>
 #include <micro_ros_platformio.h>
 // #include <micro_ros_arduino.h>
@@ -26,3 +30,6 @@ public:
     void intialize_comms();
     void execute();
 };
+
+
+#endif

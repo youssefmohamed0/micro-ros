@@ -4,9 +4,12 @@
 Ir_sensor::Ir_sensor(unsigned int pin)
 {
     pinMode(pin, INPUT);
+    this->pin_number = pin;
 }
 
-bool Ir_sensor::get_reading()
+int Ir_sensor::get_reading()
 {
-    return digitalRead(this->pin_number);
+    if (digitalRead(this->pin_number))
+        return 1;
+    return 0;
 }
