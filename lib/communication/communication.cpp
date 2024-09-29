@@ -1,4 +1,6 @@
 #include "communication.h"
+#include "motor.h"
+#include "ir_sensor.h"
 rcl_subscription_t subscriber;
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
@@ -8,7 +10,13 @@ rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
-double distance = 0;  /////////////////////*\\\\\\\\\\\\\\\\\\\\\
+
+// double distance = 0;  /////////////////////*\\\\\\\\\\\\\\\\\\\\
+
+int ir_count = 0;
+
+Motor left_motor(2,4);
+Ir_sensor ir(5);
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -16,25 +24,42 @@ double distance = 0;  /////////////////////*\\\\\\\\\\\\\\\\\\\\\
 void subscription_callback(const void * msgin)
 {  
   const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
-  if (msg->data == 1)
+  
+  if (msg->data == 1)    // forward
+    {
     digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
-    // digitalWrite(motor1_forward,HIGH);
-    // digitalWrite(motor2_forward,HIGH);
-    // forward
-  if (msg->data == 2);
-    // left
+    
+    left_motor.rotate_forward();
+    }
+  if (msg->data == 2)   // left
+    left_motor.stop();
+
   if (msg->data == 3)
-    digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
-    // backward
-  if (msg->data == 4);
-    // right
+    {// backward
+    left_motor.rotate_backward();
+    }
+  if (msg->data == 4);    // right
+
 }
+
+int flag = 0;
+
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {  
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
-    pub_msg.data = distance;
+    
+    if (digitalRead(5))
+    {
+      if(flag == 0)
+      {
+      ir_count++;
+      digitalWrite(BUILTIN_LED,LOW);
+      flag = 1;
+      }
+    digitalWrite(BUILTIN_LED,HIGH);
+    pub_msg.data = ir_count;
   }
 }
 
