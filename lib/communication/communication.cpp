@@ -12,16 +12,16 @@ rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
 
-// double distance = 0;  /////////////////////*\\\\\\\\\\\\\\\\\\\\
+double distance = 0;
 // digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
 
 int ir_count = 0;
 
 Motor left_motor(2,4);
-// Motor right_motor(12,14);
-// Motor motors[2] = {left_motor, right_motor};
+Motor right_motor(12,14);
+Motor* motors[2] = {&left_motor, &right_motor};
 Ir_sensor ir(5);
-// Rover our_rover(motors, ir, 14);
+Rover our_rover(motors, &ir, 14);
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -33,6 +33,7 @@ void subscription_callback(const void * msgin)
   if (msg->data == 1)    
   {
     left_motor.rotate_forward();  // forward
+    // our_rover.move_forward();
   }
   if (msg->data == 2)   
   {
@@ -49,6 +50,7 @@ void subscription_callback(const void * msgin)
   if (msg->data == 0)   
   {
     left_motor.stop();  // stop
+    // our_rover.stop();
   }
 
 }
@@ -65,7 +67,8 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
     {
       if(prev_state == 0)
       {
-      ir_count++;
+        // ir.ir_count++;
+        ir_count++;
       prev_state = 1;
       }
       else if (prev_state == 1 && !ir.get_reading())
@@ -73,6 +76,9 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
         prev_state = 0;
       }
     }
+
+    distance = our_rover.get_distance(ir_count);
+
     pub_msg.data = ir_count;
   }
 }
