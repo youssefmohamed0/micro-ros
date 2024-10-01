@@ -18,7 +18,7 @@ double distance = 0;
 int ir_count = 0;
 
 Motor left_motor(2,4);
-Motor right_motor(12,14);
+Motor right_motor(19,22);
 Motor* motors[2] = {&left_motor, &right_motor};
 Ir_sensor ir(5);
 Rover our_rover(motors, &ir, 14);
@@ -32,25 +32,25 @@ void subscription_callback(const void * msgin)
   
   if (msg->data == 1)    
   {
-    left_motor.rotate_forward();  // forward
-    // our_rover.move_forward();
+    // left_motor.rotate_forward();  // forward
+    our_rover.move_forward();
   }
   if (msg->data == 2)   
   {
-      // left
+    our_rover.turn_left(); // left
   }
   if (msg->data == 3)
   {
-    left_motor.rotate_backward(); // backward
+    our_rover.move_backward(); // backward
   }
   if (msg->data == 4)   
   {
-      // right
+    our_rover.turn_right();  // right
   }
   if (msg->data == 0)   
   {
-    left_motor.stop();  // stop
-    // our_rover.stop();
+    // left_motor.stop();  // stop
+    our_rover.stop();
   }
 
 }

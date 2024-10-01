@@ -56,6 +56,7 @@ void Rover::turn_right()
 }
 void Rover::stop()
 {
+    this->state = 0;
     this->motors[0]->stop();
     this->motors[1]->stop();
 }
