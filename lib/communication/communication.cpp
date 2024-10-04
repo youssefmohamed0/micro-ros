@@ -15,9 +15,7 @@ rcl_node_t node;
 rcl_timer_t timer;
 
 double distance = 0;
-// digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
-
-int ir_count = 0;
+// int ir_count = 0;
 
 Servo s;
 int servo_pin = 9;
@@ -25,9 +23,11 @@ int servo_pin = 9;
 Motor left_motor(2,4);
 Motor right_motor(19,22);
 Motor* motors[2] = {&left_motor, &right_motor};
-Ir_sensor ir(5);
+Ir_sensor ir1(5);
+Ir_sensor ir2(18);
+Ir_sensor* irs[2] = {&ir1, &ir2};
 
-Rover our_rover(motors, &ir ,s ,servo_pin , 65);
+Rover our_rover(motors, irs ,s ,servo_pin , 65);
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -65,7 +65,8 @@ void subscription_callback(const void * msgin)
 
 }
 
-int prev_state = 0;
+int prev_state1 = 0;
+int prev_state2 = 0;
 int metal = 0;
 Metal_sensor met(22);
 
@@ -74,32 +75,45 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
-    
-    // if (ir.get_reading() || prev_state)
+    // first ir sensor
+    if (our_rover.get_ir_reading(1) || prev_state1)
+    {
+      if(prev_state1 == 0)
+      {
+        our_rover.ir1_count++;
+        prev_state1 = 1;
+      }
+      else if (prev_state1 == 1 && !our_rover.get_ir_reading(1))
+      {
+        prev_state1 = 0;
+      }
+    }
+    // second ir sensor
+    if (our_rover.get_ir_reading(2) || prev_state2)
+    {
+      if(prev_state2 == 0)
+      {
+        our_rover.ir2_count++;
+        prev_state2 = 1;
+      }
+      else if (prev_state2 == 1 && !our_rover.get_ir_reading(2))
+      {
+        prev_state2 = 0;
+      }
+    }
+
+    distance = our_rover.get_distance();
+
+    // if (met.get_reading())
     // {
-    //   if(prev_state == 0)
-    //   {
-    //     // ir.ir_count++;
-    //     ir_count++;
-    //   prev_state = 1;
-    //   }
-    //   else if (prev_state == 1 && !ir.get_reading())
-    //   {
-    //     prev_state = 0;
-    //   }
+    //   metal = 1;
+    // }
+    // else
+    // {
+    //   metal = 0;
     // }
 
-    // distance = our_rover.get_distance(ir_count);
-
-    if (met.get_reading())
-    {
-      metal = 1;
-    }
-    else
-    {
-      metal = 0;
-    }
-    pub_msg.data = metal;
+    pub_msg.data = distance;
   }
 }
 

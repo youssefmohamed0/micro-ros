@@ -60,20 +60,22 @@ void Rover::stop()
     this->motors[0]->stop();
     this->motors[1]->stop();
 }
-double Rover::get_distance(int ir_count)
+double Rover::get_distance()
 {
-    this->distance = ir_count/20 * this->wheele_circumference;
+    this->distance = (this->ir1_count + this->ir2_count) /40 * this->wheele_circumference;
     return this->distance;
 }
-
-unsigned int Rover::get_ir_reading()
+unsigned int Rover::get_ir_reading(int choice)
 {
-    return this->ir->get_reading();
+    if (choice == 1)
+        return this->irs[0]->get_reading();
+    if (choice == 2)
+        return this->irs[1]->get_reading();
 }
-float Rover::get_wheele_circumference()
-{
-    return this->wheele_circumference;
-}
+// float Rover::get_wheele_circumference()
+// {
+//     return this->wheele_circumference;
+// }
 void Rover::close_gripper()
 {
     this->servo.write(0);
@@ -95,7 +97,7 @@ void Rover::operate_gripper()
         this->close_gripper();
     }
 }
-Rover::Rover(Motor* m[2], Ir_sensor* ir, Servo servo, int servo_pin, float circumference)
+Rover::Rover(Motor* m[2], Ir_sensor* ir[2], Servo servo, int servo_pin, float circumference)
 {
     this->distance = 0;
     this->wheele_circumference = circumference;
@@ -104,7 +106,10 @@ Rover::Rover(Motor* m[2], Ir_sensor* ir, Servo servo, int servo_pin, float circu
     this->motors[1] = m[1];
     this->state = 0;
 
-    this->ir = ir;
+    this->irs[0] = ir[0];
+    this->irs[1] = ir[1];
+    this->ir1_count = 0;
+    this->ir2_count = 0;
 
     this->servo = servo;
     servo.attach(servo_pin);
