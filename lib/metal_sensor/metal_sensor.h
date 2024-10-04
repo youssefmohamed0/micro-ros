@@ -6,7 +6,7 @@ class Metal_sensor
 private:
     unsigned int pin_number;
 public:
-    bool get_reading();
+    int get_reading();
     Metal_sensor(unsigned int pin);
 };
 

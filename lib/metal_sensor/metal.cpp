@@ -6,7 +6,11 @@ Metal_sensor::Metal_sensor(unsigned int pin)
     pinMode(pin, INPUT);
 }
 
-bool Metal_sensor::get_reading()
+int Metal_sensor::get_reading()
 {
-    return digitalRead(this->pin_number);
+    if (!digitalRead(this->pin_number))
+    {
+        return 1;
+    }
+    return 0;
 }

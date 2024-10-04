@@ -77,13 +77,40 @@ unsigned int Rover::get_wheele_circumference()
 {
     return this->wheele_circumference;
 }
-
-Rover::Rover(Motor* m[2], Ir_sensor* ir, unsigned int circumference)
+void Rover::close_gripper()
+{
+    this->servo.write(0);
+    this->servo_state = 0;
+}
+void Rover::open_gripper()
+{
+    this->servo.write(1023);
+    this->servo_state = 1;
+}
+void Rover::operate_gripper()
+{
+    if(this->servo_state == 0)
+    {
+        this->open_gripper();
+    }
+    else
+    {
+        this->close_gripper();
+    }
+}
+Rover::Rover(Motor* m[2], Ir_sensor* ir, Servo servo, int servo_pin,  unsigned int circumference)
 {
     this->distance = 0;
     this->wheele_circumference = circumference;
+    
     this->motors[0] = m[0];
     this->motors[1] = m[1];
-    this->ir = ir;
     this->state = 0;
+
+    this->ir = ir;
+
+    this->servo = servo;
+    servo.attach(servo_pin);
+    this->servo_state = 0;
+    
 }

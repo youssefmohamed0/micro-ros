@@ -2,6 +2,8 @@
 #include "motor.h"
 #include "ir_sensor.h"
 #include "rover.h"
+#include "metal_sensor.h"
+
 rcl_subscription_t subscriber;
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
@@ -17,11 +19,15 @@ double distance = 0;
 
 int ir_count = 0;
 
+Servo s;
+int servo_pin = 9;
+
 Motor left_motor(2,4);
 Motor right_motor(19,22);
 Motor* motors[2] = {&left_motor, &right_motor};
 Ir_sensor ir(5);
-Rover our_rover(motors, &ir, 14);
+
+Rover our_rover(motors, &ir ,s ,servo_pin , 65);
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -47,6 +53,10 @@ void subscription_callback(const void * msgin)
   {
     our_rover.turn_right();  // right
   }
+  if (msg->data == 5) // G
+  {
+    our_rover.operate_gripper();
+  }
   if (msg->data == 0)   
   {
     // left_motor.stop();  // stop
@@ -56,6 +66,8 @@ void subscription_callback(const void * msgin)
 }
 
 int prev_state = 0;
+int metal = 0;
+Metal_sensor met(22);
 
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {  
@@ -63,23 +75,31 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
     
-    if (ir.get_reading() || prev_state)
+    // if (ir.get_reading() || prev_state)
+    // {
+    //   if(prev_state == 0)
+    //   {
+    //     // ir.ir_count++;
+    //     ir_count++;
+    //   prev_state = 1;
+    //   }
+    //   else if (prev_state == 1 && !ir.get_reading())
+    //   {
+    //     prev_state = 0;
+    //   }
+    // }
+
+    // distance = our_rover.get_distance(ir_count);
+
+    if (met.get_reading())
     {
-      if(prev_state == 0)
-      {
-        // ir.ir_count++;
-        ir_count++;
-      prev_state = 1;
-      }
-      else if (prev_state == 1 && !ir.get_reading())
-      {
-        prev_state = 0;
-      }
+      metal = 1;
     }
-
-    distance = our_rover.get_distance(ir_count);
-
-    pub_msg.data = ir_count;
+    else
+    {
+      metal = 0;
+    }
+    pub_msg.data = metal;
   }
 }
 
