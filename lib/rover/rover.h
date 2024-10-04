@@ -11,14 +11,14 @@ private:
     Motor* motors[2];
     Ir_sensor* ir;
     double distance;
-    unsigned int wheele_circumference;
+    float wheele_circumference;
     int state;
     Servo servo;
     int servo_state;
     void close_gripper();
     void open_gripper();
 public:
-    Rover (Motor* motors[2], Ir_sensor* ir, Servo servo, int servo_pin,  unsigned int circumference);
+    Rover (Motor* motors[2], Ir_sensor* ir, Servo servo, int servo_pin,  float circumference);
     void move_forward();
     void move_backward();
     void turn_left();
@@ -27,7 +27,7 @@ public:
     double get_distance(int ir_count);
     // void set_distance(double dist);
     unsigned int get_ir_reading();
-    unsigned int get_wheele_circumference();
+    float get_wheele_circumference();
     void operate_gripper();
 };
 
