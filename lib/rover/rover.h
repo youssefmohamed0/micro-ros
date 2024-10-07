@@ -1,7 +1,8 @@
 #ifndef ROVER_H
 #define ROVER_H
 
-#include <Servo.h>
+// #include <Servo.h>
+#include <ESP32Servo.h>
 #include "motor.h"
 #include "ir_sensor.h"
 #include "metal_sensor.h"
@@ -14,6 +15,7 @@ private:
     double distance;
     float wheele_circumference;
     int state;
+    
     Servo servo;
     int servo_state;
     void close_gripper();

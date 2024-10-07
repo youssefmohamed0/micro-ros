@@ -3,7 +3,7 @@
 
 
 #include <Arduino.h>
-#include <Servo.h>
+#include <ESP32Servo.h>
 #include <micro_ros_platformio.h>
 // #include <micro_ros_arduino.h>
 #include <stdio.h>

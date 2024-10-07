@@ -57,7 +57,7 @@ void subscription_callback(const void * msgin)
   {
     our_rover.operate_gripper();
   }
-  if (msg->data == 0)   
+  if (msg->data == 0)   // B
   {
     // left_motor.stop();  // stop
     our_rover.stop();
@@ -67,8 +67,8 @@ void subscription_callback(const void * msgin)
 
 int prev_state1 = 0;
 int prev_state2 = 0;
-int metal = 0;
-Metal_sensor met(22);
+// int metal = 0;
+// Metal_sensor met(22);
 
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {  
