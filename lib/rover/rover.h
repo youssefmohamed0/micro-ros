@@ -15,6 +15,8 @@ private:
     double distance;
     float wheele_circumference;
     int state;
+    // float factor;
+    int greater_motor;
     
     Servo servo;
     int servo_state;
@@ -30,11 +32,15 @@ public:
     void turn_left();
     void turn_right();
     void stop();
+
+    void calibrate();
+
     double get_distance();
     // void set_distance(double dist);
     unsigned int get_ir_reading(int choice);
     // float get_wheele_circumference();
     void operate_gripper();
+    void read_from_ir();
 };
 
 #endif

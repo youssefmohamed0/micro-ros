@@ -9,6 +9,7 @@ private:
     int state;     // 0: static, 1,: forward, -1: backward
     int speed;
 public:
+    float factor;
     Motor (unsigned int fp, unsigned int bp);
     void rotate_forward();
     void rotate_backward();

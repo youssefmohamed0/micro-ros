@@ -76,6 +76,93 @@ unsigned int Rover::get_ir_reading(int choice)
 // {
 //     return this->wheele_circumference;
 // }
+void Rover::read_from_ir()
+{
+
+if (this->get_ir_reading(1) || this->irs[0]->prev_state)
+    {
+      if(this->irs[0]->prev_state == 0)
+      {
+        this->ir1_count++;
+        this->irs[0]->prev_state = 1;
+      }
+      else if (this->irs[0]->prev_state == 1 && !this->get_ir_reading(1))
+      {
+        this->irs[0]->prev_state = 0;
+      }
+    }
+
+if (this->get_ir_reading(2) || this->irs[1]->prev_state)
+    {
+      if(this->irs[1]->prev_state == 0)
+      {
+        this->ir2_count++;
+        this->irs[1]->prev_state = 1;
+      }
+      else if (this->irs[1]->prev_state == 1 && !this->get_ir_reading(1))
+      {
+        this->irs[1]->prev_state = 0;
+      }
+    }
+    float factor = min(this->ir1_count,this->ir2_count) / max(this->ir1_count,this->ir2_count);
+
+if(abs(this->ir1_count-this->ir2_count)>60)
+    if(this->ir1_count>this->ir2_count)
+    {
+        this->motors[0]->factor = factor;
+    }
+    else
+    {
+        this->motors[1]->factor = factor;
+    }
+
+}
+// void Rover::calibrate()
+// {
+// int temp1 = 0, temp2 = 0;
+// this->move_forward();
+// while (temp1 < 200 and temp2 < 200)
+// {
+// if (this->get_ir_reading(1) || this->irs[0]->prev_state)
+//     {
+//       if(this->irs[0]->prev_state == 0)
+//       {
+//         temp1++;
+//         this->irs[0]->prev_state = 1;
+//       }
+//       else if (this->irs[0]->prev_state == 1 && !this->get_ir_reading(1))
+//       {
+//         this->irs[0]->prev_state = 0;
+//       }
+//     }
+
+// if (this->get_ir_reading(2) || this->irs[1]->prev_state)
+//     {
+//       if(this->irs[1]->prev_state == 0)
+//       {
+//         temp2++;
+//         this->irs[1]->prev_state = 1;
+//       }
+//       else if (this->irs[1]->prev_state == 1 && !this->get_ir_reading(1))
+//       {
+//         this->irs[1]->prev_state = 0;
+//       }
+//     }
+// }
+// // min/max
+// float multiplier = min(temp1,temp2) / max(temp1,temp2);
+// this->stop();
+
+// if(temp1>temp2)
+// {
+//     this->motors[0]->mult = multiplier;
+// }
+// else
+// {
+//     this->motors[1]->mult = multiplier;
+// }
+
+// }
 void Rover::close_gripper()
 {
     this->servo.write(0);
@@ -114,5 +201,7 @@ Rover::Rover(Motor* m[2], Ir_sensor* ir[2], Servo servo, int servo_pin, float ci
     this->servo = servo;
     servo.attach(servo_pin);
     this->servo_state = 0;
+
+    // this->factor = 1;
     
 }
