@@ -8,7 +8,7 @@ void Motor::rotate_forward()
         // digitalWrite(BUILTIN_LED,!digitalRead(BUILTIN_LED));
         this->speed+=70;
         if(this->speed > 255)
-            this->speed == 255;
+            this->speed = 255;
         // analogWrite(this->forward_pin,this->speed * this->factor);
         analogWrite(this->forward_pin,this->speed);
         analogWrite(this->backward_pin,0);

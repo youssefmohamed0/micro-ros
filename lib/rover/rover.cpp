@@ -3,7 +3,7 @@
 
 void Rover::move_forward()
 {   
-    if (this->state == 0 || this->state == 1)
+    if (this->state == 0 )
     {
     this->motors[0]->rotate_forward();
     this->motors[1]->rotate_forward();  
@@ -17,7 +17,7 @@ void Rover::move_forward()
 }
 void Rover::move_backward()
 {
-    if (this->state == 0 || this->state == 3)
+    if (this->state == 0 )
     {
     this->motors[0]->rotate_backward();
     this->motors[1]->rotate_backward();  
@@ -32,8 +32,8 @@ void Rover::turn_left()
 {
     if (this->state == 0)
     {
-    this->motors[0]->rotate_forward();
-    this->motors[1]->rotate_backward();  
+    this->motors[1]->rotate_forward();
+    this->motors[0]->rotate_backward();  
     this->state = 2;     
     }
     else
@@ -45,8 +45,8 @@ void Rover::turn_right()
 {
     if (this->state == 0)
     {
-    this->motors[0]->rotate_backward();
-    this->motors[1]->rotate_forward();  
+    this->motors[1]->rotate_backward();
+    this->motors[0]->rotate_forward();  
     this->state = 4;     
     }
     else

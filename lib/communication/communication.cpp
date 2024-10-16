@@ -20,8 +20,8 @@ double distance = 0;
 Servo s;
 int servo_pin = 27;
 
-Motor left_motor(2,32);
-Motor right_motor(18,17);
+Motor left_motor(32,2);
+Motor right_motor(17,18);
 Motor* motors[2] = {&left_motor, &right_motor};
 Ir_sensor ir1(25);
 Ir_sensor ir2(19);
@@ -83,35 +83,36 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &pub_msg, NULL));
-    our_rover.read_from_ir();
-    // // first ir sensor
-    // if (our_rover.get_ir_reading(1) || prev_state1)
-    // {
-    //   if(prev_state1 == 0)
-    //   {
-    //     our_rover.ir1_count++;
-    //     prev_state1 = 1;
-    //   }
-    //   else if (prev_state1 == 1 && !our_rover.get_ir_reading(1))
-    //   {
-    //     prev_state1 = 0;
-    //   }
-    // }
-    // // second ir sensor
-    // if (our_rover.get_ir_reading(2) || prev_state2)
-    // {
-    //   if(prev_state2 == 0)
-    //   {
-    //     our_rover.ir2_count++;
-    //     prev_state2 = 1;
-    //   }
-    //   else if (prev_state2 == 1 && !our_rover.get_ir_reading(2))
-    //   {
-    //     prev_state2 = 0;
-    //   }
-    // }
+    // our_rover.read_from_ir();
+    // first ir sensor
+    if (our_rover.get_ir_reading(1) || prev_state1)
+    {
+      if(prev_state1 == 0)
+      {
+        our_rover.ir1_count++;
+        prev_state1 = 1;
+      }
+      else if (prev_state1 == 1 && !our_rover.get_ir_reading(1))
+      {
+        prev_state1 = 0;
+      }
+    }
+    // second ir sensor
+    if (our_rover.get_ir_reading(2) || prev_state2)
+    {
+      if(prev_state2 == 0)
+      {
+        our_rover.ir2_count++;
+        prev_state2 = 1;
+      }
+      else if (prev_state2 == 1 && !our_rover.get_ir_reading(2))
+      {
+        prev_state2 = 0;
+      }
+    }
 
-    distance = our_rover.get_distance();
+    // distance = our_rover.get_distance();
+    distance = our_rover.ir1_count;
 
     // if (met.get_reading())
     // {
@@ -152,7 +153,7 @@ void Communication::intialize_comms()
     &publisher,
     &node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "distance");
+    "feedback");
 
   // create timer,
   const unsigned int timer_timeout = 0;

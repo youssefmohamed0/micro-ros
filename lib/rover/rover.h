@@ -16,7 +16,6 @@ private:
     float wheele_circumference;
     int state;
     // float factor;
-    int greater_motor;
     
     Servo servo;
     int servo_state;
@@ -24,8 +23,8 @@ private:
     void open_gripper();
 public:
     Rover (Motor* motors[2], Ir_sensor* irs[2], Servo servo, int servo_pin,  float circumference);
-    int ir1_count;
-    int ir2_count;
+    float ir1_count;
+    float ir2_count;
     
     void move_forward();
     void move_backward();
@@ -33,7 +32,7 @@ public:
     void turn_right();
     void stop();
 
-    void calibrate();
+    // void calibrate();
 
     double get_distance();
     // void set_distance(double dist);
